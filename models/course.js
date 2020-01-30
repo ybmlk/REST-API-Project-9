@@ -41,6 +41,7 @@ module.exports = sequelize => {
   // A 'course' can be associated with only one 'user'
   Course.associate = model => {
     Course.belongsTo(model.User, {
+      as: 'user',
       foreignKey: {
         fieldName: 'userID',
         allowNull: false,

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Course } = require('../models');
+const { Course, User } = require('../models');
 
 /* Handler function to wrap each function */
 function asyncHandler(cb) {
@@ -17,7 +17,14 @@ function asyncHandler(cb) {
 router.get(
   '/',
   asyncHandler(async (req, res, next) => {
-    const courses = await Course.findAll();
+    const courses = await Course.findAll({
+      include: [
+        {
+          model: User,
+          as: 'user',
+        },
+      ],
+    });
     res.json(courses);
   })
 );
