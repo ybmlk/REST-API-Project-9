@@ -55,10 +55,29 @@ router.get(
   authenticateUser,
   asyncHandler(async (req, res, next) => {
     const user = req.currentUser;
-    res.json({ 
+    res.json({
       name: `${user.firstName} ${user.lastName}`,
-      emailAddress: user.emailAddress 
+      emailAddress: user.emailAddress,
     });
+  })
+);
+
+router.post(
+  '/',
+  asyncHandler(async (req, res) => {
+    try {
+      const user = await req.body;
+      user.password = bcryptjs.hashSync(user.password);
+      User.create(user);
+      res.json({ body: user });
+    } catch (err) {
+      if (err.name === 'SequelizeValidationError') {
+        const errMsg = err.errors.map(e => e.message);
+        res.status(400).json({ errors: errMsg });
+      } else {
+        throw err;
+      }
+    }
   })
 );
 

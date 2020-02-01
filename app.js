@@ -17,11 +17,13 @@ const app = express();
 
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 // TODO setup your api routes here
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/courses', coursesRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/courses', coursesRouter);
 
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {
