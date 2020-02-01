@@ -37,7 +37,7 @@ This application is a backend REST API. It allows users to create courses. It re
 
    > npm start
 
-4. Open `http://localhost:5000/` in Postman
+4. To test the Express server, browse to `http://localhost:5000/` in Postman
 
 ## License
 

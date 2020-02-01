@@ -55,6 +55,7 @@ router.get(
   '/',
   asyncHandler(async (req, res, next) => {
     const courses = await Course.findAll({
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
       include: [
         {
           model: User,
@@ -73,6 +74,7 @@ router.get(
   asyncHandler(async (req, res) => {
     const course = await Course.findAll({
       where: { id: req.params.id },
+      attributes: { exclude: ["createdAt", "updatedAt"] },
       include: [
         {
           model: User,
