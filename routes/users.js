@@ -65,7 +65,7 @@ router.get(
   })
 );
 
-/* Post create users. */
+/* Create users. */
 router.post(
   '/',
   [
@@ -100,13 +100,13 @@ router.post(
           emailAddress: { [Op.like]: req.body.emailAddress },
         },
       });
-      // If matching email doesn't exist...
+      // If the email provided is new...
       if (existingUser.length < 1) {
         const user = await req.body;
         user.password = bcryptjs.hashSync(user.password);
         User.create(user);
         res.setHeader('Location', '/');
-        res.status(201).json();
+        res.status(201).end();
       } else {
         res.status(400).json({ message: 'User already exists' });
       }
