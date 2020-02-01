@@ -18,12 +18,19 @@ router.get(
   '/',
   asyncHandler(async (req, res, next) => {
     const courses = await Course.findAll({
-      include: [
-        {
-          model: User,
-          as: 'user',
-        },
-      ],
+      include: [{ model: User, as: 'user' }],
+    });
+    res.json(courses);
+  })
+);
+
+/* GET an individual course */
+router.get(
+  '/:id',
+  asyncHandler(async (req, res, next) => {
+    const courses = await Course.findAll({
+      where: { id: req.params.id },
+      include: [{ model: User, as: 'user' }],
     });
     res.json(courses);
   })

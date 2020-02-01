@@ -62,6 +62,7 @@ router.get(
   })
 );
 
+/* Post create users. */
 router.post(
   '/',
   asyncHandler(async (req, res) => {
@@ -69,7 +70,7 @@ router.post(
       const user = await req.body;
       user.password = bcryptjs.hashSync(user.password);
       User.create(user);
-      res.json({ body: user });
+      res.status(201).end();
     } catch (err) {
       if (err.name === 'SequelizeValidationError') {
         const errMsg = err.errors.map(e => e.message);
