@@ -1,6 +1,8 @@
 const express = require('express');
 const auth = require('basic-auth');
 const bcryptjs = require('bcryptjs');
+const { Op } = require('sequelize');
+const { check, validationResult } = require('express-validator');
 const { User } = require('../models');
 
 const router = express.Router();
@@ -16,18 +18,19 @@ function asyncHandler(cb) {
   };
 }
 
+/* Authentication middleware */
 const authenticateUser = async (req, res, next) => {
   let message = null;
   const credentials = auth(req);
-
+  // If email and password is provided...
   if (credentials) {
     const user = await User.findOne({
       where: { emailAddress: credentials.name },
     });
-
+    // If the email provided is found in the database...
     if (user) {
       const authenticated = bcryptjs.compareSync(credentials.pass, user.password);
-
+      // If the password provided is a match...
       if (authenticated) {
         console.log(`Authentication successful for email: ${user.emailAddress}`);
         req.currentUser = user;
@@ -49,7 +52,7 @@ const authenticateUser = async (req, res, next) => {
   }
 };
 
-/* GET all users  */
+/* GET currently authenticated user */
 router.get(
   '/',
   authenticateUser,
@@ -65,18 +68,47 @@ router.get(
 /* Post create users. */
 router.post(
   '/',
+  [
+    check('firstName')
+      .exists()
+      .withMessage('"firstName" is required'),
+    check('lastName')
+      .exists()
+      .withMessage('"lastName" is required'),
+    check('emailAddress')
+      .exists()
+      .withMessage('"emailAddress" is required')
+      .isEmail()
+      .withMessage('Please Provide a valid "emailAddress"'),
+    check('password')
+      .exists()
+      .withMessage('"password" is required')
+      .isLength({ min: 8, max: 20 })
+      .withMessage('"password" should be between 8 - 20 characters'),
+  ],
   asyncHandler(async (req, res) => {
-    try {
-      const user = await req.body;
-      user.password = bcryptjs.hashSync(user.password);
-      User.create(user);
-      res.status(201).end();
-    } catch (err) {
-      if (err.name === 'SequelizeValidationError') {
-        const errMsg = err.errors.map(e => e.message);
-        res.status(400).json({ errors: errMsg });
+    const errors = validationResult(req);
+    // If there are validation errors...
+    if (!errors.isEmpty()) {
+      // Iterate through the errors and get the error messages.
+      const errorMessages = errors.array().map(error => error.msg);
+      res.status(400).json({ errors: errorMessages });
+    } else {
+      // Make sure the input email doesn't match an existing email address
+      const existingUser = await User.findAll({
+        where: {
+          emailAddress: { [Op.like]: req.body.emailAddress },
+        },
+      });
+      // If matching email doesn't exist...
+      if (existingUser.length < 1) {
+        const user = await req.body;
+        user.password = bcryptjs.hashSync(user.password);
+        User.create(user);
+        res.setHeader('Location', '/');
+        res.status(201).json();
       } else {
-        throw err;
+        res.status(400).json({ message: 'User already exists' });
       }
     }
   })
