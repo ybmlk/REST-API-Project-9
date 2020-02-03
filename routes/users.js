@@ -71,10 +71,14 @@ router.post(
   [
     check('firstName')
       .exists()
-      .withMessage('"firstName" is required'),
+      .withMessage('"firstName" is required')
+      .notEmpty()
+      .withMessage('Please enter a "firstName"'),
     check('lastName')
       .exists()
-      .withMessage('"lastName" is required'),
+      .withMessage('"lastName" is required')
+      .notEmpty()
+      .withMessage('Please enter a "lastName"'),
     check('emailAddress')
       .exists()
       .withMessage('"emailAddress" is required')

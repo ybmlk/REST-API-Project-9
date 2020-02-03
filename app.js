@@ -3,6 +3,7 @@
 // load modules
 const express = require('express');
 const morgan = require('morgan');
+const { sequelize } = require('./models');
 
 // import routes
 const indexRouter = require('./routes');
@@ -19,6 +20,16 @@ const app = express();
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// test the connection to the database.
+(async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Connection to the database has been established successfully.');
+  } catch (error) {
+    console.log('Unable to connect to the database:', error);
+  }
+})();
 
 // TODO setup your api routes here
 app.use('/', indexRouter);

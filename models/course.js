@@ -29,10 +29,10 @@ module.exports = sequelize => {
         },
       },
       estimatedTime: {
-        type: Sequelize.TEXT,
+        type: Sequelize.STRING,
       },
       materialsNeeded: {
-        type: Sequelize.TEXT,
+        type: Sequelize.STRING,
       },
     },
     { sequelize }

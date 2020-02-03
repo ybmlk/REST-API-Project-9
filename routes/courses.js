@@ -74,7 +74,7 @@ router.get(
   asyncHandler(async (req, res) => {
     const course = await Course.findAll({
       where: { id: req.params.id },
-      attributes: { exclude: ["createdAt", "updatedAt"] },
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
       include: [
         {
           model: User,
@@ -94,10 +94,14 @@ router.post(
   [
     check('title')
       .exists()
-      .withMessage('"title" is required'),
+      .withMessage('"title" is required')
+      .notEmpty()
+      .withMessage('Please enter a "title"'),
     check('description')
       .exists()
-      .withMessage('"description" is required'),
+      .withMessage('"description" is required')
+      .notEmpty()
+      .withMessage('Please enter a "description"'),
   ],
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
@@ -110,8 +114,8 @@ router.post(
       const course = await req.body;
       // the 'userId' for the course comes from currently authenticated user
       course.userId = req.currentUser.id;
-      Course.create(course);
-      res.setHeader('Location', `/api/course/${course.id}`);
+      const currentCourse = await Course.create(course);
+      res.setHeader('Location', `/api/course/${currentCourse.id}`);
       res.status(201).end();
     }
   })
