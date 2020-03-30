@@ -1,3 +1,5 @@
+'use strict';
+
 const express = require('express');
 const auth = require('basic-auth');
 const bcryptjs = require('bcryptjs');
